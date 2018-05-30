@@ -117,6 +117,23 @@ public class MainActivity extends AppCompatActivity {
                     camera.takePicture(shutterCallback, rawCallback, jpegCallback);
                 }
             });*/
+
+            preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    camera.autoFocus (new Camera.AutoFocusCallback() {
+                        public void onAutoFocus(boolean success, Camera camera) {
+                            if(success){
+                                Toast.makeText(getApplicationContext(),"Auto Focus Success",Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(getApplicationContext(),"Auto Focus Failed",Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            });
+
         }
 
         preview.setCamera(null);
@@ -149,6 +166,13 @@ public class MainActivity extends AppCompatActivity {
         preview.setCamera(camera);
     }
 
+    Thread th = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            //구현 내용
+            camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+        }
+    });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -169,7 +193,8 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+                th.start();
+//                new EventTask().execute();
             }
         });
 
@@ -293,53 +318,90 @@ public class MainActivity extends AppCompatActivity {
             //int w = bitmap.getWidth();
             //int h = bitmap.getHeight();
 
+//            resetCam();
+
             //이미지를 디바이스 방향으로 회전
             Matrix matrix = new Matrix();
             matrix.postRotate(orientation);
+            matrix.postScale(0.3f, 0.3f);
             bitmap =  Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
 
             //bitmap을 byte array로 변환
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 70, stream);
             byte[] currentData = stream.toByteArray();
 
             //파일로 저장
             new SaveImageTask().execute(currentData);
+//            FileOutputStream outStream = null;
+//
+//            // Write to SD Card
+//            try {
+//                File sdCard = Environment.getExternalStorageDirectory();
+//                File dir = new File (sdCard.getAbsolutePath() + "/camtest");
+//                dir.mkdirs();
+//
+//                String fileName = String.format("%d.jpg", System.currentTimeMillis());
+//                File outFile = new File(dir, fileName);
+//
+//                outStream = new FileOutputStream(outFile);
+//                outStream.write(currentData[0]);
+//                outStream.flush();
+//                outStream.close();
+//
+//                Log.d(TAG, "onPictureTaken - wrote bytes: " + currentData.length + " to "
+//                        + outFile.getAbsolutePath());
+//
+//                refreshGallery(outFile);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//            }
             resetCam();
             Log.d(TAG, "onPictureTaken - jpeg");
         }
     };
 
+    private class EventTask extends AsyncTask {
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+            return null;
+        }
+    }
+
     private class SaveImageTask extends AsyncTask<byte[], Void, Void> {
 
         @Override
         protected Void doInBackground(byte[]... data) {
-            FileOutputStream outStream = null;
-
-            // Write to SD Card
-            try {
-                File sdCard = Environment.getExternalStorageDirectory();
-                File dir = new File (sdCard.getAbsolutePath() + "/camtest");
-                dir.mkdirs();
-
-                String fileName = String.format("%d.jpg", System.currentTimeMillis());
-                File outFile = new File(dir, fileName);
-
-                outStream = new FileOutputStream(outFile);
-                outStream.write(data[0]);
-                outStream.flush();
-                outStream.close();
-
-                Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to "
-                        + outFile.getAbsolutePath());
-
-                refreshGallery(outFile);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-            }
+//            FileOutputStream outStream = null;
+//
+//            // Write to SD Card
+//            try {
+//                File sdCard = Environment.getExternalStorageDirectory();
+//                File dir = new File (sdCard.getAbsolutePath() + "/camtest");
+//                dir.mkdirs();
+//
+//                String fileName = String.format("%d.jpg", System.currentTimeMillis());
+//                File outFile = new File(dir, fileName);
+//
+//                outStream = new FileOutputStream(outFile);
+//                outStream.write(data[0]);
+//                outStream.flush();
+//                outStream.close();
+//
+//                Log.d(TAG, "onPictureTaken - wrote bytes: " + data.length + " to "
+//                        + outFile.getAbsolutePath());
+//
+//                refreshGallery(outFile);
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//            }
             return null;
         }
 
