@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static void doRestart(Context c) {
+        //  테스트 커밋용
         //http://stackoverflow.com/a/22345538
         try {
             //check if the context is given
