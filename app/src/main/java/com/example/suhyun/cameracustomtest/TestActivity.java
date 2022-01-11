@@ -38,6 +38,8 @@ public class TestActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
 //        테스트주석2222
 
+//        테스트 주석 1111
+
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
